@@ -1,0 +1,563 @@
+﻿<UserControl x:Class = "TDC.Tools.ProjectTimer.Views.EventLogView"
+             xmlns = "http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x = "http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc = "http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d = "http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls = "http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:viewModels = "clr-namespace:TDC.Tools.ProjectTimer.ViewModels"
+             xmlns:validation = "clr-namespace:TDC.Tools.ProjectTimer.Validation"
+             xmlns:tools = "clr-namespace:TDC.Tools.ProjectTimer.Tools"
+             mc:Ignorable = "d"
+             d:DataContext = "{d:DesignInstance Type=viewModels:EventLogViewModel, IsDesignTimeCreatable=True}" >
+    <Grid>
+        <Grid Panel.ZIndex = "0"
+              IsEnabled = "{Binding Path=IsBusy, Converter={StaticResource BoolToBoolInverseConverter}}" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height = "Auto" />
+                <RowDefinition Height = "Auto" />
+                <RowDefinition Height = "Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width = ".7*" />
+                <ColumnDefinition Width = ".3*" />
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Row = "0"
+                       Grid.Column = "0"
+                       Grid.ColumnSpan = "2"
+                       LastChildFill = "False" >
+                <DockPanel.Resources>
+                    <Style TargetType = "{x:Type Label}"
+                           BasedOn = "{StaticResource {x:Type Label}}" >
+                        <Setter Property = "Margin"
+                                Value = "25,3,3,3" />
+                    </Style>
+                    <Style TargetType = "{x:Type Button}"
+                           BasedOn = "{StaticResource {x:Type Button}}" >
+                        <Setter Property = "Margin"
+                                Value = "10,0,0,0" />
+                        <Setter Property = "VerticalAlignment"
+                                Value = "Stretch" />
+                        <Setter Property = "HorizontalAlignment"
+                                Value = "Stretch" />
+                        <Setter Property = "Width"
+                                Value = "100" />
+                        <Setter Property = "MinHeight"
+                                Value = "40" />
+                    </Style>
+                    <Style TargetType = "{x:Type DatePicker}"
+                           BasedOn = "{StaticResource {x:Type DatePicker}}" >
+                        <Setter Property = "Margin"
+                                Value = "2,2,2,2" />
+                        <Setter Property = "VerticalAlignment"
+                                Value = "Center" />
+                        <Setter Property = "VerticalContentAlignment"
+                                Value = "Center" />
+                        <Setter Property = "HorizontalAlignment"
+                                Value = "Center" />
+                        <Setter Property = "HorizontalContentAlignment"
+                                Value = "Center" />
+                    </Style>
+                </DockPanel.Resources>
+                <Border x:Name = "TimeSelectionIsVisible"
+                        DockPanel.Dock = "Left"
+                        VerticalAlignment = "Top" >
+                    <StackPanel Orientation = "Horizontal"
+                                Margin = "25,10" >
+
+                        <Label Name = "EventLogStartTimeLabel"
+                               Content = "Beginn" />
+                        <DatePicker Name = "EventLogStartTime" />
+                        <Label Name = "EventLogEndTimeLabel"
+                               Content = "Ende" />
+                        <DatePicker Name = "EventLogEndTime" />
+                    </StackPanel>
+                </Border>
+                <StackPanel DockPanel.Dock = "Right"
+                            Orientation = "Horizontal"
+                            Margin = "25,10" >
+                    <Button Name = "EvaluateEventLogCommand" >
+                        <StackPanel Orientation = "Horizontal" >
+                            <Rectangle Width = "24"
+                                       Height = "24" >
+                                <Rectangle.Fill>
+                                    <VisualBrush Visual = "{DynamicResource appbar_cabinet_out}" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Margin = "15,0,0,0"
+                                       VerticalAlignment = "Center"
+                                       Typography.Capitals = "AllPetiteCaps" >
+                                UPDATE
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button Name = "ExportToExcelCommand" >
+                        <StackPanel Orientation = "Horizontal" >
+                            <Rectangle Width = "24"
+                                       Height = "24" >
+                                <Rectangle.Fill>
+                                    <VisualBrush Visual = "{DynamicResource appbar_office_excel}" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Margin = "15,0,0,0"
+                                       VerticalAlignment = "Center"
+                                       Typography.Capitals = "AllPetiteCaps" >
+                                EXPORT
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button Name = "ShowHelpCommand" >
+                        <StackPanel Orientation = "Horizontal" >
+                            <Rectangle Width = "24"
+                                       Height = "24" >
+                                <Rectangle.Fill>
+                                    <VisualBrush Visual = "{DynamicResource appbar_book_perspective_help}" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Margin = "15,0,0,0"
+                                       VerticalAlignment = "Center"
+                                       Typography.Capitals = "AllPetiteCaps" >
+                                HILFE
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+            </DockPanel>
+            <GroupBox Grid.Row = "1"
+                      Grid.Column = "0"
+                      Margin = "5"
+                      BorderThickness = "1"
+                      BorderBrush = "{DynamicResource AccentColorBrush}"
+                      MinHeight = "150"
+                      MaxHeight = "600"
+                      MinWidth = "600" >
+                <GroupBox.Header>
+                    Zeiten
+                </GroupBox.Header>
+                <DockPanel>
+                    <Border DockPanel.Dock = "Bottom"
+                            BorderThickness = "2"
+                            Margin = "5"
+                            Padding = "5"
+                            CornerRadius = "3"
+                            BorderBrush = "{DynamicResource ControlBorderBrush}"
+                            Background = "{DynamicResource GrayBrush9}" >
+                        <TextBlock TextWrapping = "WrapWithOverflow"
+                                   FontWeight = "DemiBold" >
+                            Nur Start- und Endzeiten, zu denen keine Eventlogeinträge vorliegen und die Pausenzeiten können editiert werden.
+                            <LineBreak />
+                            Tage, an denen weder ein Start- noch Endzeitpunkt im Eventlog vorliegt, können nicht editiert werden.
+                        </TextBlock>
+                    </Border>
+                    <DataGrid Name = "DailyTimes"
+                              ItemsSource = "{Binding Path=DailyTimes}"
+                              AutoGenerateColumns = "False"
+                              CanUserAddRows = "False"
+                              CanUserDeleteRows = "False"
+                              CanUserReorderColumns = "False"
+                              GridLinesVisibility = "All"
+                              ColumnWidth = "*"
+                              HeadersVisibility="All">
+                        <DataGrid.Resources>
+                            <tools:BindingProxy x:Key="IsValidatingTimesProxy" Data="{Binding Path=IsValidatingTimes}"/>
+                            <Style TargetType = "{x:Type DataGridCell}"
+                                   BasedOn = "{StaticResource {x:Type DataGridCell}}" >
+                                <Style.Triggers>
+                                    <Trigger Property = "IsReadOnly"
+                                             Value = "True" >
+                                        <Setter Property = "Background"
+                                                Value = "{DynamicResource AccentColorBrush4}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.RowStyle>
+                            <Style TargetType = "{x:Type DataGridRow}" >
+                                <Style.Triggers>
+                                    <DataTrigger Binding = "{Binding IsWeekEndDay}"
+                                                 Value = "True" >
+                                        <Setter Property = "Background"
+                                                Value = "DarkGray" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.RowValidationRules>
+                            <validation:UpTimeValidationRule ValidatesOnTargetUpdated="True" ValidationStep="UpdatedValue">
+                                <tools:BoolDependencyObject Value="{Binding Data, Source={StaticResource IsValidatingTimesProxy}}"/>
+                            </validation:UpTimeValidationRule>
+                            <validation:BreakTimeValidationRule ValidatesOnTargetUpdated="True" ValidationStep="UpdatedValue">
+                                <tools:BoolDependencyObject Value="{Binding Data, Source={StaticResource IsValidatingTimesProxy}}"/>
+                            </validation:BreakTimeValidationRule>
+                        </DataGrid.RowValidationRules>
+                        <DataGrid.RowValidationErrorTemplate>
+                            <ControlTemplate>
+                                <Grid Margin="4" ToolTip="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Path=(Validation.Errors)[0].ErrorContent}">
+                                    <Rectangle x:Name="ValidationErrorRectangle" Width = "18"
+                                               Height = "18">
+                                        <Rectangle.Fill>
+                                            <VisualBrush  Visual = "{DynamicResource appbar_warning_circle_red}" Stretch="Uniform" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Path=DataContext.IsBreakTimeValid}" Value="False">
+                                        <Setter TargetName="ValidationErrorRectangle" Property="Fill">
+                                            <Setter.Value>
+                                                <VisualBrush  Visual="{DynamicResource appbar_cup_red}" Stretch="Uniform" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Path=DataContext.IsUpTimeValid}" Value="False">
+                                        <Setter TargetName="ValidationErrorRectangle" Property="Fill">
+                                            <Setter.Value>
+                                                <VisualBrush  Visual="{DynamicResource appbar_clock_red}" Stretch="Uniform" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </DataGrid.RowValidationErrorTemplate>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header = "Tag"
+                                                Binding = "{Binding Path=Day, StringFormat=dd\\ MMMM\\ yyyy, ConverterCulture=de-DE}"
+                                                IsReadOnly = "True" />
+                            <DataGridTextColumn Header = "Beginn"
+                                                Binding = "{Binding Path=Start, StringFormat=HH\\:mm\\:ss, ConverterCulture=de-DE}"
+                                                IsReadOnly = "True" />
+                            <DataGridTextColumn Header = "Ende"
+                                                Binding = "{Binding Path=End, StringFormat=HH\\:mm\\:ss, ConverterCulture=de-DE}"
+                                                IsReadOnly = "True" />
+                            <DataGridTextColumn Header = "Zeit"
+                                                Binding = "{Binding Path=TotalUpTime, StringFormat=hh\\:mm\\:ss, ConverterCulture=de-DE}"
+                                                IsReadOnly = "True" />
+                            <DataGridTextColumn Header = "Beginn (Berater)"
+                                                Binding = "{Binding Path=ConsultantStart, StringFormat=HH\\:mm, ConverterCulture=de-DE}" >
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType = "{x:Type DataGridCell}" >
+                                        <Style.Triggers>
+                                            <DataTrigger Binding = "{Binding Path=IsReadOnlyConsultantStart}"
+                                                         Value = "True" >
+                                                <Setter Property = "IsTabStop"
+                                                        Value = "False" />
+                                                <Setter Property = "Focusable"
+                                                        Value = "False" />
+                                                <Setter Property = "Background"
+                                                        Value = "{DynamicResource AccentColorBrush4}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header = "Ende (Berater)"
+                                                Binding = "{Binding Path=ConsultantEnd, StringFormat=HH\\:mm, ConverterCulture=de-DE}" >
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType = "{x:Type DataGridCell}" >
+                                        <Style.Triggers>
+                                            <DataTrigger Binding = "{Binding Path=IsReadOnlyConsultantEnd}"
+                                                         Value = "True" >
+                                                <Setter Property = "IsTabStop"
+                                                        Value = "False" />
+                                                <Setter Property = "Focusable"
+                                                        Value = "False" />
+                                                <Setter Property = "Background"
+                                                        Value = "{DynamicResource AccentColorBrush4}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header = "Pause"
+                                                Binding = "{Binding Path=ConsultantBreakTime, StringFormat=hh\\:mm, ConverterCulture=de-DE}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType = "{x:Type DataGridCell}" >
+                                        <Style.Triggers>
+                                            <DataTrigger Binding = "{Binding Path=IsReadOnlyConsultantBreakTime}"
+                                                         Value = "True" >
+                                                <Setter Property = "IsTabStop"
+                                                        Value = "False" />
+                                                <Setter Property = "Focusable"
+                                                        Value = "False" />
+                                                <Setter Property = "Background"
+                                                        Value = "{DynamicResource AccentColorBrush4}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header = "Zeit (Berater)"
+                                                Binding = "{Binding Path=ConsultantUpTime, StringFormat=hh\\:mm, ConverterCulture=de-DE}"
+                                                IsReadOnly = "True" />
+                            <DataGridTextColumn Header = "Beschreibung"
+                                                Binding = "{Binding Path=Description}"
+                                                MinWidth = "250" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </GroupBox>
+            <Expander Grid.Row = "2"
+                      Grid.Column = "0"
+                      Grid.ColumnSpan = "2"
+                      Margin = "5,10"
+                      BorderThickness = "1"
+                      BorderBrush = "{DynamicResource AccentColorBrush}"
+                      Visibility = "{Binding Path=SelectedItem, ElementName=DailyTimes, Converter={StaticResource NullOrEmptyToVisibilityConverter}}" >
+                <Expander.Header>
+                    Eventlog Einträge
+                </Expander.Header>
+                <Grid DataContext = "{Binding Path=SelectedItem, ElementName=DailyTimes}" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <DataGrid Name = "EventLogEntries"
+                              ItemsSource = "{Binding Path=EventLogEntries}"
+                              Grid.Column = "0"
+                              AutoGenerateColumns = "False"
+                              CanUserAddRows = "False"
+                              CanUserDeleteRows = "False"
+                              CanUserReorderColumns = "False"
+                              IsReadOnly = "True"
+                              MinHeight = "100"
+                              GridLinesVisibility = "All"
+                              ColumnWidth = "*" >
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header = "Index"
+                                                Binding = "{Binding Path=Index}" />
+                            <DataGridTextColumn Header = "InstanceId"
+                                                Binding = "{Binding Path=InstanceId}" />
+                            <DataGridTextColumn Header = "EventId"
+                                                Binding = "{Binding Path=EventId}" />
+                            <DataGridTextColumn Header = "Event"
+                                                Binding = "{Binding Path=EventAsEnum}" />
+                            <DataGridTextColumn Header = "Time"
+                                                Binding = "{Binding Path=TimeCreated, StringFormat=dd\\.MM\\.yyyy \\ HH\\:mm, ConverterCulture=de-DE}" />
+                            <DataGridTextColumn Header = "Type"
+                                                Binding = "{Binding Path=EntryType}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Border Grid.Column = "1"
+                            Margin = "2"
+                            BorderThickness = "1"
+                            BorderBrush = "{DynamicResource AccentColorBrush}"
+                            Padding = "3" >
+                        <Grid HorizontalAlignment = "Stretch" >
+                            <Grid.Resources>
+                                <Style TargetType = "{x:Type TextBox}"
+                                       BasedOn = "{StaticResource {x:Type TextBox}}" >
+                                    <Setter Property = "IsReadOnly"
+                                            Value = "True" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width = "0.25*" />
+                                <ColumnDefinition Width = "0.25*" />
+                                <ColumnDefinition Width = "0.25*" />
+                                <ColumnDefinition Width = "0.25*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row = "0"
+                                   Grid.Column = "0"
+                                   Name = "InstanceIdLabel"
+                                   Content = "InstanceId" />
+                            <TextBox Grid.Row = "0"
+                                     Grid.Column = "1"
+                                     Text = "{Binding Path=SelectedItem.InstanceId, ElementName=EventLogEntries, Mode=OneWay}" />
+                            <Label Grid.Row = "0"
+                                   Grid.Column = "2"
+                                   Name = "EventIdLabel"
+                                   Content = "EventId" />
+                            <TextBox Grid.Row = "0"
+                                     Grid.Column = "3"
+                                     Text = "{Binding Path=SelectedItem.EventId, ElementName=EventLogEntries, Mode=OneWay}" />
+                            <Label Grid.Row = "1"
+                                   Grid.Column = "0"
+                                   Name = "EventAsEnumLabel"
+                                   Content = "Event" />
+                            <TextBox Grid.Row = "1"
+                                     Grid.Column = "1"
+                                     Text = "{Binding Path=SelectedItem.EventAsEnum, ElementName=EventLogEntries, Mode=OneWay}" />
+                            <Label Grid.Row = "1"
+                                   Grid.Column = "2"
+                                   Name = "TimeCreatedLabel"
+                                   Content = "Time Created" />
+                            <TextBox Grid.Row = "1"
+                                     Grid.Column = "3"
+                                     Text = "{Binding Path=SelectedItem.TimeCreated, ElementName=EventLogEntries, Mode=OneWay}" />
+                            <Label Grid.Row = "2"
+                                   Grid.Column = "0"
+                                   Name = "EntryTypeLabel"
+                                   Content = "Type" />
+                            <TextBox Grid.Row = "2"
+                                     Grid.Column = "1"
+                                     Text = "{Binding Path=SelectedItem.EntryType, ElementName=EventLogEntries, Mode=OneWay}" />
+                            <Label Grid.Row = "2"
+                                   Grid.Column = "2"
+                                   Name = "SourceLabel"
+                                   Content = "Source" />
+                            <TextBox Grid.Row = "2"
+                                     Grid.Column = "3"
+                                     Text = "{Binding Path=SelectedItem.Source, ElementName=EventLogEntries, Mode=OneWay}" />
+                            <Label Grid.Row = "3"
+                                   Grid.Column = "0"
+                                   Name = "UserNameLabel"
+                                   Content = "User" />
+                            <TextBox Grid.Row = "3"
+                                     Grid.Column = "1"
+                                     Text = "{Binding Path=SelectedItem.UserName, ElementName=EventLogEntries, Mode=OneWay}" />
+                            <Label Grid.Row = "3"
+                                   Grid.Column = "2"
+                                   Name = "MachineNameLabel"
+                                   Content = "Machine" />
+                            <TextBox Grid.Row = "3"
+                                     Grid.Column = "3"
+                                     Text = "{Binding Path=SelectedItem.MachineName, ElementName=EventLogEntries, Mode=OneWay}" />
+                            <Label Grid.Row = "4"
+                                   Grid.Column = "0"
+                                   Name = "MessageLabel"
+                                   Content = "Message" />
+                            <TextBox Grid.Row = "4"
+                                     Grid.Column = "1"
+                                     Grid.ColumnSpan = "3"
+                                     Text = "{Binding Path=SelectedItem.Message, ElementName=EventLogEntries, Mode=OneWay}"
+                                     MinLines = "2" />
+                            <Label Grid.Row = "5"
+                                   Grid.Column = "0"
+                                   Name = "DataLabel"
+                                   Content = "Data" />
+                            <TextBox Grid.Row = "5"
+                                     Grid.Column = "1"
+                                     Grid.ColumnSpan = "3"
+                                     Text = "{Binding Path=SelectedItem.Data, ElementName=EventLogEntries, Mode=OneWay, Converter={StaticResource ByteArrayToStringConverter}}"
+                                     MinLines = "2" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Expander>
+            <StackPanel Grid.Row = "1"
+                        Grid.Column = "1" >
+                <GroupBox Margin = "5,5"
+                          BorderThickness = "1"
+                          BorderBrush = "{DynamicResource AccentColorBrush}"
+                          MinWidth = "325"
+                          VerticalAlignment = "Top" >
+                    <GroupBox.Header>
+                        Zusammenfassung (Industriestunden)
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.Resources>
+                            <Style TargetType = "{x:Type TextBox}"
+                                   BasedOn = "{StaticResource {x:Type TextBox}}" >
+                                <Setter Property = "IsReadOnly"
+                                        Value = "True" />
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height = "Auto" />
+                            <RowDefinition Height = "Auto" />
+                            <RowDefinition Height = "Auto" />
+                            <RowDefinition Height = "Auto" />
+                            <RowDefinition Height = "Auto" />
+                            <RowDefinition Height = "*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width = "0.5*" />
+                            <ColumnDefinition Width = "0.5*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row = "0"
+                               Grid.Column = "0"
+                               Name = "MonthsLabel"
+                               Content = "Monat(e)" />
+                        <TextBox Grid.Row = "0"
+                                 Grid.Column = "1"
+                                 Text = "{Binding Path=Months, Mode=OneWay}" />
+                        <Label Grid.Row = "1"
+                               Grid.Column = "0"
+                               Name = "SumWorkingTimesLabel"
+                               Content = "Arbeitszeit (Berater)" />
+                        <TextBox Grid.Row = "1"
+                                 Grid.Column = "1"
+                                 Text = "{Binding Path=SumWorkingTimes, StringFormat=F2, Mode=OneWay}" />
+                        <Label Grid.Row = "2"
+                               Grid.Column = "0"
+                               Name = "SumEventlogTimesLabel"
+                               Content = "Arbeitszeit (Eventlog)" />
+                        <TextBox Grid.Row = "2"
+                                 Grid.Column = "1"
+                                 Text = "{Binding Path=SumRealTimes, StringFormat=F2, Mode=OneWay}" />
+                        <Label Grid.Row = "3"
+                               Grid.Column = "0"
+                               Name = "SumBreakTimesLabel"
+                               Content = "Pausenzeit" />
+                        <TextBox Grid.Row = "3"
+                                 Grid.Column = "1"
+                                 Text = "{Binding Path=SumBreakTimes, StringFormat=F2, Mode=OneWay}" />
+                        <Label Grid.Row = "4"
+                               Grid.Column = "0"
+                               Name = "RoundErrorLabel"
+                               Content = "Rundungsfehler" />
+                        <TextBox Grid.Row = "4"
+                                 Grid.Column = "1"
+                                 Text = "{Binding Path=RoundError, Converter={StaticResource RoundErrorValueConverter}, Mode=OneWay}" />
+                        <Border Grid.Row = "5"
+                                Grid.Column = "0"
+                                Grid.ColumnSpan = "2"
+                                BorderThickness = "2"
+                                Margin = "3"
+                                Padding = "3"
+                                CornerRadius = "3"
+                                BorderBrush = "{DynamicResource ControlBorderBrush}"
+                                Background = "{DynamicResource GrayBrush9}" >
+                            <TextBlock TextWrapping = "WrapWithOverflow"
+                                       FontWeight = "DemiBold" >
+                                Arbeitszeit (Eventlog) enthält die berechnete Arbeitszeit aus dem Eventlog abzüglich der Pausenzeiten.
+                                <LineBreak />
+                                Für Tage, an denen keine Zeit aus dem Eventlog berechnet werden kann, wird die Beraterzeit angesetzt.
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+        <controls:ProgressRing IsActive = "{Binding Path=IsBusy}"
+                               EllipseDiameterScale = "1.25"
+                               Panel.ZIndex = "1"
+                               MinWidth = "151"
+                               MinHeight = "150" />
+        <Border Margin = "5,65,10,10"
+                Panel.ZIndex = "2"
+                Background = "{DynamicResource ControlBackgroundBrush}"
+                BorderThickness = "2"
+                BorderBrush = "{DynamicResource ControlBorderBrush}"
+                CornerRadius = "5"
+                Padding = "5"
+                Visibility = "{Binding Path=HelpDocumentSequence, Converter={StaticResource NullOrEmptyToVisibilityConverter}}" >
+            <Border.Resources>
+                <Style TargetType = "{x:Type DocumentViewer}" >
+                    <Setter Property = "Template" >
+                        <Setter.Value>
+                            <ControlTemplate TargetType = "{x:Type DocumentViewer}" >
+                                <ScrollViewer CanContentScroll = "True"
+                                              Focusable = "True"
+                                              HorizontalScrollBarVisibility = "Auto"
+                                              VerticalScrollBarVisibility = "Auto"
+                                              x:Name = "PART_ContentHost" />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Border.Resources>
+            <Border.Effect>
+                <DropShadowEffect />
+            </Border.Effect>
+            <DocumentViewer Document = "{Binding Path=HelpDocumentSequence}" />
+        </Border>
+    </Grid>
+</UserControl>

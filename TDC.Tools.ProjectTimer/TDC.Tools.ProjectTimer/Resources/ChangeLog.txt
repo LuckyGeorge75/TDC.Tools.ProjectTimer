@@ -1,0 +1,10 @@
+﻿Version 0.7.2.0 - 30.08.2018
+----------------------------
+
+- speed up event log parsing significally
+- added validation of break and up times in accordance with german working time laws
+
+Version 0.7.1.0 - 25.02.2018
+----------------------------
+
+- first working version
